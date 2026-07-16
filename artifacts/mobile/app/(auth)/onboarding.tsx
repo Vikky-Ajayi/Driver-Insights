@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Dimensions,
   Image,
   Pressable,
   StyleSheet,
@@ -10,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '@/hooks/useColors';
+
+const { height: SCREEN_HEIGHT } = Dimensions.get('window');
 
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
@@ -26,8 +29,8 @@ export default function OnboardingScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Illustration */}
-      <View style={styles.illustrationContainer}>
+      {/* Illustration — ~55% of screen */}
+      <View style={[styles.illustrationContainer, { height: SCREEN_HEIGHT * 0.55 }]}>
         <Image
           source={require('@/assets/images/onboarding.png')}
           style={styles.illustration}
@@ -36,19 +39,19 @@ export default function OnboardingScreen() {
       </View>
 
       {/* Content */}
-      <View style={[styles.content, { paddingBottom: insets.bottom + 16 }]}>
-        <Text style={[styles.heading, { color: colors.foreground }]}>
-          Find More Rides.{'\n'}
-          <Text style={[styles.headingMuted, { color: colors.mutedForeground }]}>
-            Get More Deliveries.{'\n'}
-          </Text>
-          <Text style={[styles.headingMuted, { color: colors.mutedForeground }]}>
-            Earn More.
-          </Text>
+      <View style={[styles.content, { paddingBottom: insets.bottom + 20 }]}>
+        {/* Heading: alternating black / gray per Figma */}
+        <Text style={styles.heading}>
+          <Text style={[styles.headingBlack, { color: colors.foreground }]}>Find More </Text>
+          <Text style={[styles.headingGray, { color: colors.mutedForeground }]}>Rides.{'\n'}</Text>
+          <Text style={[styles.headingBlack, { color: colors.foreground }]}>Get More </Text>
+          <Text style={[styles.headingGray, { color: colors.mutedForeground }]}>Deliveries.{'\n'}</Text>
+          <Text style={[styles.headingGray, { color: colors.mutedForeground }]}>Earn More.</Text>
         </Text>
 
         <Text style={[styles.subtitle, { color: colors.mutedForeground }]}>
-          RideSpot helps drivers and dispatch riders find high-demand areas to get more rides,
+          RideSpot helps drivers and dispatch riders find{'\n'}
+          high-demand areas to get more rides,{'\n'}
           deliveries, and more time earning.
         </Text>
 
@@ -77,7 +80,7 @@ export default function OnboardingScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   illustrationContainer: {
-    flex: 1,
+    width: '100%',
     overflow: 'hidden',
   },
   illustration: {
@@ -85,33 +88,38 @@ const styles = StyleSheet.create({
     height: '100%',
   },
   content: {
+    flex: 1,
     paddingHorizontal: 24,
-    paddingTop: 24,
-    gap: 14,
+    paddingTop: 20,
+    gap: 12,
   },
   heading: {
-    fontSize: 28,
+    fontSize: 30,
     fontFamily: 'Inter_700Bold',
-    lineHeight: 34,
-    letterSpacing: -1.1,
+    lineHeight: 38,
+    letterSpacing: -1.2,
   },
-  headingMuted: {
-    fontSize: 28,
+  headingBlack: {
+    fontSize: 30,
     fontFamily: 'Inter_700Bold',
-    lineHeight: 34,
-    letterSpacing: -1.1,
+    lineHeight: 38,
+  },
+  headingGray: {
+    fontSize: 30,
+    fontFamily: 'Inter_700Bold',
+    lineHeight: 38,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: 14,
     fontFamily: 'Inter_400Regular',
-    lineHeight: 22,
-    letterSpacing: -0.3,
+    lineHeight: 21,
+    letterSpacing: -0.2,
   },
   primaryBtn: {
-    paddingVertical: 17,
+    paddingVertical: 18,
     borderRadius: 14,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: 6,
   },
   primaryBtnText: {
     fontSize: 16,

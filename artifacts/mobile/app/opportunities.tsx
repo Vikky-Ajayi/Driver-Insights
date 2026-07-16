@@ -55,6 +55,7 @@ export default function OpportunitiesScreen() {
           <OpportunityCard
             hotspot={item}
             type={isDelivery ? 'delivery' : 'taxi'}
+            fullWidth
             onViewDetails={() =>
               router.push({ pathname: '/details', params: { id: item.id, data: JSON.stringify(item), type: type ?? 'taxi' } })
             }
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 6,
   },
-  headerTitle: { fontSize: 24, fontFamily: 'Inter_700Bold', letterSpacing: -0.8 },
+  headerTitle: { fontSize: 28, fontFamily: 'Inter_700Bold', letterSpacing: -1.0 },
   closeBtn: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center' },
   headerSubtitle: { fontSize: 14, fontFamily: 'Inter_400Regular', paddingHorizontal: 20, marginBottom: 16 },
   list: { paddingHorizontal: 20, gap: 14 },

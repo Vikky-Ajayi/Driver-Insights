@@ -15,15 +15,7 @@ interface Props {
   type: 'taxi' | 'delivery';
   onViewDetails: () => void;
   onDriveThere: () => void;
-}
-
-function DemandLabel({ label, colors }: { label: string; colors: ReturnType<typeof useColors> }) {
-  return (
-    <View style={styles.demandRow}>
-      <Text style={[styles.demandText, { color: colors.demand }]}>{label} </Text>
-      <Feather name="trending-up" size={13} color={colors.demand} />
-    </View>
-  );
+  fullWidth?: boolean;
 }
 
 function StatItem({
@@ -46,7 +38,13 @@ function StatItem({
   );
 }
 
-export default function OpportunityCard({ hotspot, type, onViewDetails, onDriveThere }: Props) {
+export default function OpportunityCard({
+  hotspot,
+  type,
+  onViewDetails,
+  onDriveThere,
+  fullWidth,
+}: Props) {
   const colors = useColors();
 
   const handleDriveThere = () => {
@@ -56,74 +54,91 @@ export default function OpportunityCard({ hotspot, type, onViewDetails, onDriveT
 
   const timeRange = `${hotspot.time_start} - ${hotspot.time_end}`;
 
-  const icon =
+  const iconEl =
     type === 'taxi' ? (
-      <MaterialCommunityIcons name="taxi" size={22} color="#FFFFFF" />
+      <MaterialCommunityIcons name="car-side" size={20} color="#FFFFFF" />
     ) : (
-      <MaterialCommunityIcons name="package-variant" size={22} color="#FFFFFF" />
+      <MaterialCommunityIcons name="package-variant-closed" size={20} color="#FFFFFF" />
     );
 
+  // Figma stat order:
+  // Taxi:     Drive time | Distance | Driver Saturation
+  // Delivery: Drive time | Demand Requests | Distance
+  const stats =
+    type === 'taxi'
+      ? [
+          {
+            icon: <Feather name="clock" size={14} color={colors.mutedForeground} />,
+            value: `${hotspot.drive_time_minutes} min`,
+            label: 'Drive time',
+          },
+          {
+            icon: <MaterialCommunityIcons name="map-marker-distance" size={14} color={colors.mutedForeground} />,
+            value: `${hotspot.distance_km} KM`,
+            label: 'Distance',
+          },
+          {
+            icon: <Feather name="users" size={14} color={colors.mutedForeground} />,
+            value: hotspot.driver_saturation,
+            label: 'Driver Saturation',
+          },
+        ]
+      : [
+          {
+            icon: <Feather name="clock" size={14} color={colors.mutedForeground} />,
+            value: `${hotspot.drive_time_minutes} min`,
+            label: 'Drive time',
+          },
+          {
+            icon: <Feather name="activity" size={14} color={colors.mutedForeground} />,
+            value: hotspot.demand_requests,
+            label: 'Demand Requests',
+          },
+          {
+            icon: <MaterialCommunityIcons name="map-marker-distance" size={14} color={colors.mutedForeground} />,
+            value: `${hotspot.distance_km} KM`,
+            label: 'Distance',
+          },
+        ];
+
   return (
-    <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+    <View
+      style={[
+        styles.card,
+        { backgroundColor: colors.card, borderColor: colors.border },
+        fullWidth && styles.cardFull,
+      ]}
+    >
       {/* Header row */}
       <View style={styles.headerRow}>
-        <View style={[styles.iconBox, { backgroundColor: colors.foreground }]}>{icon}</View>
+        <View style={[styles.iconBox, { backgroundColor: colors.foreground }]}>{iconEl}</View>
         <Text style={[styles.timeText, { color: colors.mutedForeground }]}>{timeRange}</Text>
       </View>
 
       {/* Venue name */}
-      <Text style={[styles.venueName, { color: colors.foreground }]} numberOfLines={1}>
+      <Text style={[styles.venueName, { color: colors.foreground }]} numberOfLines={2}>
         {hotspot.name}
       </Text>
 
       {/* Demand label */}
-      <DemandLabel label={hotspot.demand_label} colors={colors} />
+      <View style={styles.demandRow}>
+        <Text style={[styles.demandText, { color: colors.demand }]}>{hotspot.demand_label} </Text>
+        <Feather name="trending-up" size={13} color={colors.demand} />
+      </View>
 
       {/* Divider */}
       <View style={[styles.divider, { backgroundColor: colors.border }]} />
 
       {/* Stats */}
       <View style={styles.statsRow}>
-        <StatItem
-          icon={<Feather name="clock" size={14} color={colors.mutedForeground} />}
-          value={`${hotspot.drive_time_minutes} min`}
-          label="Drive time"
-          colors={colors}
-        />
-        <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-        {type === 'taxi' ? (
-          <>
-            <StatItem
-              icon={<Feather name="users" size={14} color={colors.mutedForeground} />}
-              value={hotspot.driver_saturation}
-              label="Driver Saturation"
-              colors={colors}
-            />
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-            <StatItem
-              icon={<Feather name="navigation" size={14} color={colors.mutedForeground} />}
-              value={`${hotspot.distance_km} KM`}
-              label="Distance"
-              colors={colors}
-            />
-          </>
-        ) : (
-          <>
-            <StatItem
-              icon={<Feather name="activity" size={14} color={colors.mutedForeground} />}
-              value={hotspot.demand_requests}
-              label="Demand Requests"
-              colors={colors}
-            />
-            <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
-            <StatItem
-              icon={<Feather name="navigation" size={14} color={colors.mutedForeground} />}
-              value={`${hotspot.distance_km} KM`}
-              label="Distance"
-              colors={colors}
-            />
-          </>
-        )}
+        {stats.map((s, i) => (
+          <React.Fragment key={s.label}>
+            <StatItem icon={s.icon} value={s.value} label={s.label} colors={colors} />
+            {i < stats.length - 1 && (
+              <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
+            )}
+          </React.Fragment>
+        ))}
       </View>
 
       {/* Action buttons */}
@@ -139,7 +154,7 @@ export default function OpportunityCard({ hotspot, type, onViewDetails, onDriveT
           onPress={handleDriveThere}
         >
           <Text style={[styles.solidBtnText, { color: colors.primaryForeground }]}>
-            Drive there {'›'}
+            Drive there {'>'}
           </Text>
         </Pressable>
       </View>
@@ -150,7 +165,7 @@ export default function OpportunityCard({ hotspot, type, onViewDetails, onDriveT
 const styles = StyleSheet.create({
   card: {
     width: 300,
-    borderRadius: 12,
+    borderRadius: 16,
     borderWidth: 1,
     padding: 16,
     gap: 8,
@@ -160,27 +175,31 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 2,
   },
+  cardFull: {
+    width: '100%',
+  },
   headerRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
   iconBox: {
-    width: 36,
-    height: 36,
-    borderRadius: 8,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
   timeText: {
     fontSize: 12,
     fontFamily: 'Inter_500Medium',
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
   },
   venueName: {
-    fontSize: 20,
+    fontSize: 22,
     fontFamily: 'Inter_700Bold',
-    letterSpacing: -0.5,
+    letterSpacing: -0.6,
+    lineHeight: 28,
     marginTop: 2,
   },
   demandRow: {
@@ -190,11 +209,11 @@ const styles = StyleSheet.create({
   demandText: {
     fontSize: 13,
     fontFamily: 'Inter_500Medium',
-    letterSpacing: -0.3,
+    letterSpacing: -0.2,
   },
   divider: {
     height: 1,
-    marginVertical: 4,
+    marginVertical: 2,
   },
   statsRow: {
     flexDirection: 'row',
@@ -202,7 +221,7 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    gap: 2,
+    gap: 3,
     alignItems: 'flex-start',
   },
   statValue: {
@@ -228,23 +247,23 @@ const styles = StyleSheet.create({
   },
   outlineBtn: {
     flex: 1,
-    paddingVertical: 11,
-    borderRadius: 10,
+    paddingVertical: 13,
+    borderRadius: 12,
     borderWidth: 1,
     alignItems: 'center',
   },
   outlineBtnText: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Inter_500Medium',
   },
   solidBtn: {
     flex: 1,
-    paddingVertical: 11,
-    borderRadius: 10,
+    paddingVertical: 13,
+    borderRadius: 12,
     alignItems: 'center',
   },
   solidBtnText: {
-    fontSize: 13,
+    fontSize: 14,
     fontFamily: 'Inter_600SemiBold',
   },
 });

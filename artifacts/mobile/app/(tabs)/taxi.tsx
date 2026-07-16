@@ -240,8 +240,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
   },
-  headerTitle: { fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.7 },
-  headerSubtitle: { fontSize: 13, fontFamily: 'Inter_400Regular', marginTop: 2 },
+  headerTitle: { fontSize: 28, fontFamily: 'Inter_700Bold', letterSpacing: -1.0 },
+  headerSubtitle: { fontSize: 14, fontFamily: 'Inter_400Regular', marginTop: 2 },
   statusPill: {
     flexDirection: 'row',
     alignItems: 'center',

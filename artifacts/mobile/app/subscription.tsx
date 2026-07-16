@@ -94,7 +94,7 @@ export default function SubscriptionScreen() {
     }
   };
 
-  const btnLabel = selected === 'free' ? 'Continue with Free' : `Try ${selectedPlan.label} for Free`;
+  const btnLabel = selected === 'free' ? 'Try For Free' : `Try ${selectedPlan.label} For Free`;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>

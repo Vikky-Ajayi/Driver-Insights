@@ -124,7 +124,7 @@ export default function DeliveryScreen() {
                 onPress={() => handleViewDetails(h)}
               >
                 <View style={[styles.deliveryPin, { backgroundColor: colors.foreground }]}>
-                  <MaterialCommunityIcons name="package-variant" size={14} color="#FFFFFF" />
+                  <MaterialCommunityIcons name="package-variant-closed" size={14} color="#FFFFFF" />
                 </View>
               </Marker>
             </React.Fragment>
@@ -189,8 +189,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingBottom: 12,
   },
-  headerTitle: { fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.7 },
-  headerSubtitle: { fontSize: 13, fontFamily: 'Inter_400Regular', marginTop: 2 },
+  headerTitle: { fontSize: 28, fontFamily: 'Inter_700Bold', letterSpacing: -1.0 },
+  headerSubtitle: { fontSize: 14, fontFamily: 'Inter_400Regular', marginTop: 2 },
   statusPill: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 7, borderRadius: 100, gap: 6 },
   statusDot: { width: 7, height: 7, borderRadius: 4 },
   statusText: { fontSize: 13, fontFamily: 'Inter_500Medium' },

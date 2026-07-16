@@ -152,9 +152,36 @@ export default function AccountScreen() {
         {/* More */}
         <Text style={sectionLabelStyle}>MORE</Text>
         <View style={cardStyle}>
-          <SettingRow label="FAQs" colors={colors} />
-          <SettingRow label="Contact us" colors={colors} />
-          <SettingRow label="Privacy Policy" colors={colors} />
+          <Pressable
+            style={[styles.settingRow, { borderBottomColor: colors.border }]}
+            onPress={() => {}}
+          >
+            <View style={styles.settingRowLeft}>
+              <Feather name="help-circle" size={17} color={colors.foreground} />
+              <Text style={[styles.settingLabel, { color: colors.foreground }]}>FAQs</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+          </Pressable>
+          <Pressable
+            style={[styles.settingRow, { borderBottomColor: colors.border }]}
+            onPress={() => {}}
+          >
+            <View style={styles.settingRowLeft}>
+              <Feather name="phone" size={17} color={colors.foreground} />
+              <Text style={[styles.settingLabel, { color: colors.foreground }]}>Contact us</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+          </Pressable>
+          <Pressable
+            style={[styles.settingRow, { borderBottomColor: colors.border }]}
+            onPress={() => {}}
+          >
+            <View style={styles.settingRowLeft}>
+              <Feather name="file-text" size={17} color={colors.foreground} />
+              <Text style={[styles.settingLabel, { color: colors.foreground }]}>Privacy Policy</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+          </Pressable>
           <View style={[styles.settingRow, { borderBottomColor: 'transparent' }]}>
             <Pressable onPress={() => setShowLogout(true)}>
               <Text style={[styles.settingLabel, { color: colors.destructive }]}>Log out</Text>
