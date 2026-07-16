@@ -1,0 +1,59 @@
+{
+  "expo": {
+    "name": "RideSpot",
+    "slug": "mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "mobile",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#060808"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.ridespot.mobile"
+    },
+    "android": {
+      "package": "com.ridespot.mobile",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#060808"
+      }
+    },
+    "web": {
+      "favicon": "./assets/images/icon.png"
+    },
+    "plugins": [
+      [
+        "expo-router",
+        {
+          "origin": "https://replit.com/"
+        }
+      ],
+      "expo-font",
+      "expo-web-browser",
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow RideSpot to access your location to show nearby hotspots and opportunities.",
+          "locationWhenInUsePermission": "Allow RideSpot to access your location to show nearby hotspots.",
+          "isIosBackgroundLocationEnabled": false
+        }
+      ],
+      [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "Allow RideSpot to use Face ID to secure your authentication token."
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}

@@ -1,0 +1,2 @@
+- [RideSpot Maps Web Stub](ridespot-maps.md) — react-native-maps must be wrapped in a platform split; web needs a stub or metro crashes on bundling.
+- [RideSpot Auth Routing](ridespot-auth.md) — Root index.tsx needed for auth redirect; expo-router doesn't auto-redirect without it.
