@@ -11,120 +11,90 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useColors } from '@/hooks/useColors';
-import { useAuth } from '@/contexts/AuthContext';
 
-// Trip Planner tile icon — calendar + clock + pin
-function TripPlannerIcon({ color }: { color: string }) {
-  return <MaterialCommunityIcons name="calendar-clock" size={34} color={color} />;
-}
-
-// Discover tile: stacked brand-logo cards (approximated with colored squares)
-function DiscoverIcon() {
-  return (
-    <View style={discoverStyles.stack}>
-      <View style={[discoverStyles.card, { backgroundColor: '#FF6600', zIndex: 3, transform: [{ rotate: '-6deg' }] }]}>
-        <MaterialCommunityIcons name="food-fork-drink" size={18} color="#FFFFFF" />
-      </View>
-      <View style={[discoverStyles.card, { backgroundColor: '#000000', zIndex: 2, transform: [{ rotate: '0deg' }, { translateX: 14 }, { translateY: -6 }] }]}>
-        <MaterialCommunityIcons name="alpha-a-box" size={18} color="#FFFFFF" />
-      </View>
-    </View>
-  );
-}
-
-const discoverStyles = StyleSheet.create({
-  stack: { width: 56, height: 36, position: 'relative' },
-  card: {
-    position: 'absolute',
-    width: 36,
-    height: 36,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
-
+// ─── Quick Tile ───────────────────────────────────────────────────────────────
 function QuickTile({
   title,
   subtitle,
-  icon,
+  children,
   onPress,
-  colors,
 }: {
   title: string;
   subtitle: string;
-  icon: React.ReactNode;
+  children: React.ReactNode;
   onPress: () => void;
-  colors: ReturnType<typeof useColors>;
 }) {
   return (
-    <Pressable
-      style={[styles.quickTile, { backgroundColor: colors.card, borderColor: colors.border }]}
-      onPress={onPress}
-    >
-      <View style={styles.quickTileIconWrap}>{icon}</View>
-      <Text style={[styles.quickTileTitle, { color: colors.foreground }]}>{title}</Text>
-      <Text style={[styles.quickTileSubtitle, { color: colors.mutedForeground }]}>{subtitle}</Text>
+    <Pressable style={styles.quickTile} onPress={onPress}>
+      <Text style={styles.quickTileTitle}>{title}</Text>
+      <View style={styles.quickTileImageWrap}>{children}</View>
+      <Text style={styles.quickTileSubtitle}>{subtitle}</Text>
     </Pressable>
   );
 }
 
+// ─── Suggested Row ────────────────────────────────────────────────────────────
 function SuggestedRow({
   title,
   subtitle,
-  onPress,
   icon,
-  colors,
+  onPress,
+  noBorder,
 }: {
   title: string;
   subtitle: string;
-  onPress: () => void;
   icon: React.ReactNode;
-  colors: ReturnType<typeof useColors>;
+  onPress: () => void;
+  noBorder?: boolean;
 }) {
   return (
     <Pressable
-      style={[styles.suggestedRow, { borderBottomColor: colors.border }]}
+      style={[styles.suggestedRow, noBorder && { borderBottomWidth: 0 }]}
       onPress={onPress}
     >
-      <View style={[styles.suggestedIcon, { backgroundColor: colors.secondary }]}>{icon}</View>
+      <View style={styles.suggestedIconWrap}>{icon}</View>
       <View style={styles.suggestedText}>
-        <Text style={[styles.suggestedTitle, { color: colors.foreground }]}>{title}</Text>
-        <Text style={[styles.suggestedSubtitle, { color: colors.mutedForeground }]}>{subtitle}</Text>
+        <Text style={styles.suggestedTitle}>{title}</Text>
+        <Text style={styles.suggestedSubtitle}>{subtitle}</Text>
       </View>
-      <Feather name="chevron-right" size={18} color={colors.mutedForeground} />
+      <Feather name="chevron-right" size={18} color="#9CA3AF" />
     </Pressable>
   );
 }
 
+// ─── Screen ───────────────────────────────────────────────────────────────────
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
-  const colors = useColors();
 
   return (
     <ScrollView
-      style={[styles.container, { backgroundColor: colors.background }]}
-      contentContainerStyle={[styles.content, { paddingTop: insets.top + 16, paddingBottom: 120 }]}
+      style={styles.container}
+      contentContainerStyle={[
+        styles.content,
+        { paddingTop: insets.top + 16, paddingBottom: 100 + insets.bottom },
+      ]}
       showsVerticalScrollIndicator={false}
     >
-      {/* Header */}
+      {/* ── Header ── */}
       <View style={styles.header}>
-        <Text style={[styles.headerTitle, { color: colors.foreground }]}>Home</Text>
-        <Pressable>
-          <Feather name="bell" size={22} color={colors.foreground} />
+        <Text style={styles.headerTitle}>Home</Text>
+        <Pressable style={styles.bellWrap}>
+          <Feather name="bell" size={22} color="#060808" />
         </Pressable>
       </View>
 
-      {/* Driver rating banner */}
-      <View style={[styles.banner, { backgroundColor: colors.navy }]}>
+      {/* ── Driver Rating Banner ── */}
+      <View style={styles.banner}>
         {/* Decorative circles */}
-        <View style={styles.bannerCircle1} />
-        <View style={styles.bannerCircle2} />
+        <View style={styles.bannerCircleLg} />
+        <View style={styles.bannerCircleSm} />
 
-        <View style={[styles.bannerPill, { backgroundColor: 'rgba(255,255,255,0.18)' }]}>
-          <View style={[styles.dot, { backgroundColor: '#22C55E' }]} />
+        {/* In Progress pill */}
+        <View style={styles.bannerPill}>
+          <View style={styles.greenDot} />
           <Text style={styles.bannerPillText}>In Progress</Text>
         </View>
+
         <Text style={styles.bannerHeading}>
           {"We're rebuilding your\ndriver rating"}
         </Text>
@@ -133,50 +103,71 @@ export default function HomeScreen() {
         </Text>
       </View>
 
-      {/* Quick tiles */}
+      {/* ── Quick Tiles ── */}
       <View style={styles.tilesRow}>
+        {/* Trip Planner */}
         <QuickTile
           title="Trip Planner"
           subtitle="See future hotspots"
-          icon={<TripPlannerIcon color={colors.foreground} />}
           onPress={() => router.push('/trip-planner')}
-          colors={colors}
-        />
+        >
+          <Image
+            source={require('@/assets/images/trip-planner.png')}
+            style={styles.tripPlannerImg}
+            resizeMode="contain"
+          />
+        </QuickTile>
+
+        {/* Discover */}
         <QuickTile
           title="Discover"
           subtitle="Popular gift cards"
-          icon={<DiscoverIcon />}
           onPress={() => router.push('/redeem')}
-          colors={colors}
-        />
+        >
+          <Image
+            source={require('@/assets/images/discover-cards.png')}
+            style={styles.discoverImg}
+            resizeMode="contain"
+          />
+        </QuickTile>
       </View>
 
-      {/* Suggested */}
-      <Text style={[styles.sectionTitle, { color: colors.foreground }]}>Sugessted</Text>
+      {/* ── Suggested ── */}
+      <Text style={styles.sectionTitle}>Sugessted</Text>
 
-      <View style={[styles.suggestedCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
+      <View style={styles.suggestedCard}>
         <SuggestedRow
           title="RideSpot Taxi Drivers"
           subtitle="Find areas with high ride demand"
-          icon={<MaterialCommunityIcons name="car-side" size={20} color={colors.foreground} />}
+          icon={<MaterialCommunityIcons name="car-side" size={20} color="#060808" />}
           onPress={() => router.push('/(tabs)/taxi')}
-          colors={colors}
         />
         <SuggestedRow
           title="RideSpot Delivery"
           subtitle="Find areas with high ride demand"
-          icon={<MaterialCommunityIcons name="package-variant-closed" size={20} color={colors.foreground} />}
+          icon={<MaterialCommunityIcons name="package-variant-closed" size={20} color="#060808" />}
           onPress={() => router.push('/(tabs)/delivery')}
-          colors={colors}
+          noBorder
         />
       </View>
     </ScrollView>
   );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
+const NAVY = '#1E1A52';
+
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: { paddingHorizontal: 20, gap: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: '#F2F2F7',
+  },
+  content: {
+    paddingHorizontal: 20,
+    gap: 16,
+  },
+
+  // Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -185,101 +176,170 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 28,
     fontFamily: 'Inter_700Bold',
-    letterSpacing: -1.0,
+    color: '#060808',
+    letterSpacing: -0.8,
   },
+  bellWrap: {
+    width: 38,
+    height: 38,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  // Banner
   banner: {
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: NAVY,
+    borderRadius: 18,
+    padding: 22,
     overflow: 'hidden',
     gap: 10,
-    minHeight: 160,
+    minHeight: 170,
   },
-  bannerCircle1: {
+  bannerCircleLg: {
     position: 'absolute',
-    right: -40,
-    top: -40,
+    right: -50,
+    top: -50,
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: 'rgba(255,255,255,0.06)',
+  },
+  bannerCircleSm: {
+    position: 'absolute',
+    right: 80,
+    bottom: -70,
     width: 160,
     height: 160,
     borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-  },
-  bannerCircle2: {
-    position: 'absolute',
-    right: 60,
-    bottom: -60,
-    width: 140,
-    height: 140,
-    borderRadius: 70,
     backgroundColor: 'rgba(255,255,255,0.04)',
   },
   bannerPill: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
+    backgroundColor: 'rgba(255,255,255,0.16)',
     paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingVertical: 6,
     borderRadius: 100,
-    gap: 6,
+    gap: 7,
   },
-  dot: { width: 7, height: 7, borderRadius: 4 },
-  bannerPillText: { fontSize: 12, fontFamily: 'Inter_500Medium', color: '#FFFFFF' },
+  greenDot: {
+    width: 7,
+    height: 7,
+    borderRadius: 4,
+    backgroundColor: '#22C55E',
+  },
+  bannerPillText: {
+    fontSize: 12,
+    fontFamily: 'Inter_500Medium',
+    color: '#FFFFFF',
+  },
   bannerHeading: {
     fontSize: 22,
     fontFamily: 'Inter_700Bold',
     color: '#FFFFFF',
-    letterSpacing: -0.8,
-    lineHeight: 29,
+    letterSpacing: -0.6,
+    lineHeight: 30,
   },
   bannerBody: {
     fontSize: 13,
     fontFamily: 'Inter_400Regular',
-    color: 'rgba(255,255,255,0.65)',
+    color: 'rgba(255,255,255,0.60)',
     lineHeight: 19,
   },
-  tilesRow: { flexDirection: 'row', gap: 12 },
+
+  // Quick Tiles
+  tilesRow: {
+    flexDirection: 'row',
+    gap: 12,
+  },
   quickTile: {
     flex: 1,
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16,
-    gap: 8,
-    minHeight: 140,
-    justifyContent: 'space-between',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    padding: 14,
+    minHeight: 150,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
-  quickTileIconWrap: { marginBottom: 4 },
-  quickTileTitle: { fontSize: 15, fontFamily: 'Inter_700Bold', letterSpacing: -0.3 },
-  quickTileSubtitle: { fontSize: 12, fontFamily: 'Inter_400Regular' },
-  sectionTitle: { fontSize: 22, fontFamily: 'Inter_700Bold', letterSpacing: -0.7 },
+  quickTileTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter_700Bold',
+    color: '#060808',
+    letterSpacing: -0.3,
+    marginBottom: 6,
+  },
+  quickTileImageWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 6,
+  },
+  quickTileSubtitle: {
+    fontSize: 12,
+    fontFamily: 'Inter_400Regular',
+    color: '#666666',
+    marginTop: 6,
+  },
+  tripPlannerImg: {
+    width: 90,
+    height: 72,
+  },
+  discoverImg: {
+    width: 100,
+    height: 66,
+  },
+
+  // Suggested
+  sectionTitle: {
+    fontSize: 22,
+    fontFamily: 'Inter_700Bold',
+    color: '#060808',
+    letterSpacing: -0.6,
+  },
   suggestedCard: {
-    borderRadius: 14,
-    borderWidth: 1,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
     overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.04,
-    shadowRadius: 4,
-    elevation: 1,
+    shadowOpacity: 0.06,
+    shadowRadius: 6,
+    elevation: 2,
   },
   suggestedRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     gap: 14,
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E5E5E5',
   },
-  suggestedIcon: {
+  suggestedIconWrap: {
     width: 40,
     height: 40,
     borderRadius: 10,
+    backgroundColor: '#F2F2F7',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  suggestedText: { flex: 1, gap: 2 },
-  suggestedTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold', letterSpacing: -0.3 },
-  suggestedSubtitle: { fontSize: 13, fontFamily: 'Inter_400Regular' },
+  suggestedText: {
+    flex: 1,
+    gap: 3,
+  },
+  suggestedTitle: {
+    fontSize: 15,
+    fontFamily: 'Inter_600SemiBold',
+    color: '#060808',
+    letterSpacing: -0.2,
+  },
+  suggestedSubtitle: {
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
+    color: '#666666',
+  },
 });
