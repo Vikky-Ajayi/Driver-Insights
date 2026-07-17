@@ -1,50 +1,36 @@
 # RideSpot
 
-A React Native (Expo) mobile app with an Express API backend for the RideSpot platform.
-
-## Run & Operate
-
-- **Mobile app**: workflow `artifacts/mobile: expo` — Expo dev server on port 18115
-- **API server**: workflow `artifacts/api-server: API Server` — Express on port 8080
-- `pnpm run typecheck` — full typecheck across all packages
-- `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- `DATABASE_URL` — Postgres connection string (runtime-managed by Replit, no manual setup needed)
-
-## Expo Go Preview
-
-Scan the QR code shown in the `artifacts/mobile: expo` workflow logs with Expo Go on your phone.
-The Metro bundler URL is exposed via `REPLIT_EXPO_DEV_DOMAIN`.
+A full-stack mobile platform for discovering and navigating cycling routes.
 
 ## Stack
+- **Mobile**: React Native + Expo (Expo Router, TanStack Query, Tailwind CSS)
+- **API**: Express 5 + Drizzle ORM + Zod
+- **Database**: PostgreSQL (Replit-managed, `DATABASE_URL` auto-provided)
+- **Monorepo**: pnpm workspaces
 
-- pnpm workspaces, Node.js 24, TypeScript 5.9
-- API: Express 5
-- DB: PostgreSQL + Drizzle ORM
-- Validation: Zod (`zod/v4`), `drizzle-zod`
-- API codegen: Orval (from OpenAPI spec)
-- Build: esbuild (CJS bundle)
+## Project Structure
+```
+artifacts/
+  mobile/          # Expo React Native app
+  api-server/      # Express API server (port 8080)
+  mockup-sandbox/  # Vite UI component previews
+lib/
+  db/              # Drizzle schema + migrations
+  api-spec/        # OpenAPI spec + Orval generator
+  api-client-react/ # Generated React Query hooks
+  api-zod/         # Generated Zod schemas
+```
 
-## Where things live
+## Running the Project
+- **API Server**: starts automatically on port 8080
+- **Mobile (Expo Go)**: starts automatically; scan the QR code shown in the `artifacts/mobile: expo` workflow logs with Expo Go on your phone
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+## Database
+Schema lives in `lib/db/`. To push schema changes:
+```
+pnpm --filter @workspace/db run push
+```
 
-## Architecture decisions
-
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
-
-## Product
-
-_Describe the high-level user-facing capabilities of this app once they exist._
-
-## User preferences
-
-_Populate as you build — explicit user instructions worth remembering across sessions._
-
-## Gotchas
-
-_Populate as you build — sharp edges, "always run X before Y" rules._
-
-## Pointers
-
-- See the `pnpm-workspace` skill for workspace structure, TypeScript setup, and package details
+## User Preferences
+- User wants to preview the mobile app via Expo Go (scan QR from workflow logs)
+- User is using their own API database via Replit's managed PostgreSQL
