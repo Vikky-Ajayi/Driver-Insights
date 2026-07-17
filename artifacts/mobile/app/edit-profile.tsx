@@ -20,7 +20,7 @@ export default function EditProfileScreen() {
   const colors = useColors();
   const { user } = useAuth();
 
-  const [name, setName] = useState(user?.name ?? '');
+  const [name, setName] = useState(user?.fullName ?? user?.name ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [country, setCountry] = useState(user?.country ?? '');

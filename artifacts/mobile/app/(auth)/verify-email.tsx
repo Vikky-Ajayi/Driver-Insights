@@ -48,8 +48,10 @@ export default function VerifyEmailScreen() {
     }
     setLoading(true);
     try {
-      await authApi.verifyOtp(email ?? '', code);
-      router.replace('/(tabs)/');
+      await authApi.verifyEmail(email ?? '', code);
+      Alert.alert('Email verified!', 'Your account is ready. Please log in.', [
+        { text: 'Log in', onPress: () => router.replace('/(auth)/login') },
+      ]);
     } catch (err: unknown) {
       Alert.alert('Verification failed', err instanceof Error ? err.message : 'Invalid code.');
     } finally {
@@ -66,7 +68,8 @@ export default function VerifyEmailScreen() {
         return c - 1;
       });
     }, 1000);
-    authApi.forgotPassword(email ?? '').catch(() => null);
+    // Attempt resend — silently swallows 404 if endpoint not available
+    authApi.resendVerification(email ?? '').catch(() => null);
   };
 
   return (

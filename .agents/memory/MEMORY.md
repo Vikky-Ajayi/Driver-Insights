@@ -1,2 +1,3 @@
 - [RideSpot Maps Web Stub](ridespot-maps.md) — react-native-maps must be wrapped in a platform split; web needs a stub or metro crashes on bundling.
 - [RideSpot Auth Routing](ridespot-auth.md) — Root index.tsx needed for auth redirect; expo-router doesn't auto-redirect without it.
+- [RideSpot API Contract](ridespot-api.md) — Correct backend URL (-8e87), route paths (no /v1), field names (fullName), response envelope ({ success, data }), and register flow (email-verify-first, no token on register).

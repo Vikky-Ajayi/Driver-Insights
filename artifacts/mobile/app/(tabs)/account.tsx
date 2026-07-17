@@ -75,7 +75,7 @@ export default function AccountScreen() {
           </View>
           <View style={styles.profileText}>
             <Text style={[styles.profileName, { color: colors.foreground }]}>
-              {user?.name ?? 'Driver'}
+              {user?.fullName ?? user?.name ?? 'Driver'}
             </Text>
             <Text style={[styles.profileEmail, { color: colors.mutedForeground }]}>
               {user?.email ?? 'driver@email.com'}

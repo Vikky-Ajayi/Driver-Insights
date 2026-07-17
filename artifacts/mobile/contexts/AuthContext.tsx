@@ -5,7 +5,7 @@ import React, {
   useEffect,
   useState,
 } from 'react';
-import { authApi, Driver, getToken, RegisterData, removeToken, setToken } from '@/services/api';
+import { authApi, Driver, driverApi, getToken, RegisterData, removeToken, setToken } from '@/services/api';
 
 interface AuthState {
   token: string | null;
@@ -18,6 +18,7 @@ interface AuthContextValue extends AuthState {
   register: (data: RegisterData) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (user: Driver) => void;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -29,11 +30,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isLoading: true,
   });
 
-  // Restore token on mount
+  // Restore token on mount and try to fetch profile
   useEffect(() => {
     getToken()
-      .then((token) => {
-        setState((s) => ({ ...s, token: token ?? null, isLoading: false }));
+      .then(async (token) => {
+        if (token) {
+          // Try to restore user profile from the stored token
+          try {
+            const user = await driverApi.getProfile();
+            setState({ token, user, isLoading: false });
+          } catch {
+            // Token may be expired — clear it
+            await removeToken();
+            setState({ token: null, user: null, isLoading: false });
+          }
+        } else {
+          setState((s) => ({ ...s, token: null, isLoading: false }));
+        }
       })
       .catch(() => {
         setState((s) => ({ ...s, isLoading: false }));
@@ -46,10 +59,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, token, user }));
   }, []);
 
+  // Register only creates the account — no token is returned.
+  // The caller is responsible for navigating to verify-email.
   const register = useCallback(async (data: RegisterData) => {
-    const { token, user } = await authApi.register(data);
-    await setToken(token);
-    setState((s) => ({ ...s, token, user }));
+    await authApi.register(data);
   }, []);
 
   const logout = useCallback(async () => {
@@ -61,8 +74,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setState((s) => ({ ...s, user }));
   }, []);
 
+  const refreshUser = useCallback(async () => {
+    try {
+      const user = await driverApi.getProfile();
+      setState((s) => ({ ...s, user }));
+    } catch {
+      // ignore
+    }
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser }}>
+    <AuthContext.Provider value={{ ...state, login, register, logout, updateUser, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );

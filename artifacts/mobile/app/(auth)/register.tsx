@@ -32,7 +32,7 @@ export default function RegisterScreen() {
   const colors = useColors();
   const { register } = useAuth();
 
-  const [name, setName] = useState('');
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [country, setCountry] = useState('Nigeria');
@@ -44,14 +44,14 @@ export default function RegisterScreen() {
   const [showDialModal, setShowDialModal] = useState(false);
 
   const handleRegister = async () => {
-    if (!name || !email || !phone || !password) {
+    if (!fullName || !email || !phone || !password) {
       Alert.alert('Missing fields', 'Please fill in all fields.');
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLoading(true);
     try {
-      await register({ name, email, phone: `${dialCode}${phone}`, country, password });
+      await register({ fullName, email, phone: `${dialCode}${phone}`, country, password });
       router.push({ pathname: '/(auth)/verify-email', params: { email } });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
@@ -93,8 +93,8 @@ export default function RegisterScreen() {
             style={[styles.input, { backgroundColor: colors.input, color: colors.foreground }]}
             placeholder="e.g John Doe"
             placeholderTextColor={colors.mutedForeground}
-            value={name}
-            onChangeText={setName}
+            value={fullName}
+            onChangeText={setFullName}
             autoCapitalize="words"
           />
         </View>

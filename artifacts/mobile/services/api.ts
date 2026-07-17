@@ -4,11 +4,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BASE_URL =
   process.env['EXPO_PUBLIC_API_BASE_URL'] ??
-  'https://ridespot-production.up.railway.app';
+  'https://ridespot-production-8e87.up.railway.app';
 
 const TOKEN_KEY = 'ridespot_auth_token';
 
-// SecureStore not available on web; fall back to AsyncStorage
+// ─── Token storage ────────────────────────────────────────────────────────────
+
 export async function getToken(): Promise<string | null> {
   if (Platform.OS === 'web') return AsyncStorage.getItem(TOKEN_KEY);
   return SecureStore.getItemAsync(TOKEN_KEY);
@@ -30,6 +31,11 @@ export async function removeToken(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
+// ─── HTTP client ──────────────────────────────────────────────────────────────
+
+// Backend response envelope: { success: true, data: T } or { success: false, error: { code, message } }
+type ApiEnvelope<T> = { success: true; data: T; message?: string } | { success: false; error: { code: string; message: string } };
+
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = await getToken();
   const headers: Record<string, string> = {
@@ -39,21 +45,27 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   };
 
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
+  const body = (await res.json().catch(() => ({}))) as ApiEnvelope<T>;
 
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(
-      (body as { message?: string }).message ?? `HTTP ${res.status}`
-    );
+  // Handle API-level errors (success: false) or HTTP errors
+  if (!res.ok || body.success === false) {
+    const errMsg =
+      body.success === false
+        ? body.error?.message
+        : (body as unknown as { message?: string }).message;
+    throw new Error(errMsg ?? `HTTP ${res.status}`);
   }
-  return res.json() as Promise<T>;
+
+  // Unwrap the data envelope
+  return body.data;
 }
 
-// ─── Types ───────────────────────────────────────────────────────────────────
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface Driver {
   id: string;
-  name: string;
+  fullName: string;
+  name?: string; // alias
   email: string;
   phone: string;
   country: string;
@@ -62,7 +74,7 @@ export interface Driver {
 }
 
 export interface RegisterData {
-  name: string;
+  fullName: string;
   email: string;
   phone: string;
   country: string;
@@ -74,7 +86,7 @@ export interface Hotspot {
   name: string;
   cluster_center: { lat: number; lng: number };
   radius: number;
-  intensity_score: number;        // 0–100
+  intensity_score: number;
   active_events: HotspotEvent[];
   expiry_timestamp: string;
   drive_time_minutes: number;
@@ -106,54 +118,62 @@ export interface DriverStats {
 
 export const authApi = {
   login: (email: string, password: string) =>
-    request<{ token: string; user: Driver }>('/api/v1/auth/login', {
+    request<{ token: string; user: Driver }>('/api/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     }),
 
   register: (data: RegisterData) =>
-    request<{ token: string; user: Driver }>('/api/v1/auth/register', {
+    request<Record<string, never>>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
-  verifyOtp: (email: string, otp: string) =>
-    request<{ success: boolean }>('/api/v1/auth/verify-otp', {
+  verifyEmail: (email: string, code: string) =>
+    request<Record<string, never>>('/api/auth/verify-email', {
       method: 'POST',
-      body: JSON.stringify({ email, otp }),
+      body: JSON.stringify({ email, code }),
+    }),
+
+  resendVerification: (email: string) =>
+    request<Record<string, never>>('/api/auth/resend-verification', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    }).catch(() => {
+      // Endpoint may not exist — silently swallow
     }),
 
   forgotPassword: (email: string) =>
-    request<{ success: boolean }>('/api/v1/auth/forgot-password', {
+    request<Record<string, never>>('/api/auth/forgot-password', {
       method: 'POST',
       body: JSON.stringify({ email }),
     }),
 
-  resetPassword: (email: string, otp: string, password: string) =>
-    request<{ success: boolean }>('/api/v1/auth/reset-password', {
+  resetPassword: (email: string, code: string, newPassword: string) =>
+    request<Record<string, never>>('/api/auth/reset-password', {
       method: 'POST',
-      body: JSON.stringify({ email, otp, password }),
+      body: JSON.stringify({ email, code, newPassword }),
     }),
 };
 
 // ─── Hotspot API ──────────────────────────────────────────────────────────────
 
 export const hotspotApi = {
-  getAll: () => request<Hotspot[]>('/api/v1/hotspots'),
+  getAll: () => request<Hotspot[]>('/api/hotspots'),
   getNearby: (lat: number, lng: number) =>
-    request<Hotspot[]>(`/api/v1/hotspots/nearby?lat=${lat}&lng=${lng}`),
+    request<Hotspot[]>(`/api/hotspots/nearby?lat=${lat}&lng=${lng}`),
 };
 
 // ─── Driver API ───────────────────────────────────────────────────────────────
 
 export const driverApi = {
-  getProfile: () => request<Driver>('/api/v1/driver/profile'),
+  getProfile: () => request<Driver>('/api/driver/profile'),
   updateLocation: (lat: number, lng: number) =>
-    request<void>('/api/v1/driver/location', {
+    request<void>('/api/driver/location', {
       method: 'PATCH',
       body: JSON.stringify({ lat, lng }),
     }),
-  getStats: () => request<DriverStats>('/api/v1/driver/stats'),
+  getStats: () => request<DriverStats>('/api/driver/stats'),
 };
 
 // ─── Payment API ──────────────────────────────────────────────────────────────
@@ -161,7 +181,7 @@ export const driverApi = {
 export const paymentApi = {
   initialize: (planId: string) =>
     request<{ paymentUrl: string; reference: string }>(
-      '/api/v1/payments/initialize',
+      '/api/payments/initialize',
       { method: 'POST', body: JSON.stringify({ planId }) }
     ),
 };
@@ -170,9 +190,9 @@ export const paymentApi = {
 
 export const notificationApi = {
   registerToken: (fcmToken: string) =>
-    request<void>('/api/v1/notifications/token', {
+    request<void>('/api/notifications/token', {
       method: 'POST',
       body: JSON.stringify({ token: fcmToken }),
     }),
-  getAll: () => request<unknown[]>('/api/v1/notifications'),
+  getAll: () => request<unknown[]>('/api/notifications'),
 };
