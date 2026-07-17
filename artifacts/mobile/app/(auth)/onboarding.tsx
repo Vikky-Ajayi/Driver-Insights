@@ -1,22 +1,21 @@
 import React from 'react';
 import {
-  Dimensions,
   Image,
   Pressable,
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import * as Haptics from 'expo-haptics';
 import { useColors } from '@/hooks/useColors';
 
-const { height: SCREEN_HEIGHT } = Dimensions.get('window');
-
 export default function OnboardingScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
+  const { height: SCREEN_HEIGHT } = useWindowDimensions();
 
   const handleCreateAccount = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
