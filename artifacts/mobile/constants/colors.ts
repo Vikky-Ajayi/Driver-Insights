@@ -22,7 +22,7 @@ const colors = {
     demand: '#EF3E32',       // red for demand labels
     demandBg: '#FEF2F2',     // light red background
     green: '#22C55E',        // hotspot pin green
-    navy: '#1E1A52',         // home banner dark navy
+    navy: '#0B0132',         // home banner dark navy
     navyCard: '#2A246A',     // slightly lighter navy for inner elements
     upgrade: '#3B82F6',      // blue upgrade badge
     upgradeLight: '#EFF6FF', // blue badge bg

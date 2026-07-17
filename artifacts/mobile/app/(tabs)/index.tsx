@@ -10,7 +10,6 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
-import { useColors } from '@/hooks/useColors';
 
 // ─── Quick Tile ───────────────────────────────────────────────────────────────
 function QuickTile({
@@ -85,13 +84,20 @@ export default function HomeScreen() {
 
       {/* ── Driver Rating Banner ── */}
       <View style={styles.banner}>
-        {/* Decorative circles */}
-        <View style={styles.bannerCircleLg} />
-        <View style={styles.bannerCircleSm} />
+        {/* Decorative: large faint circle ring top-right */}
+        <View style={styles.bannerRingOuter} />
+        <View style={styles.bannerRingInner} />
 
-        {/* In Progress pill */}
+        {/* Decorative: location pin vector — right side, partially cropped */}
+        <Image
+          source={require('@/assets/images/banner-pin.png')}
+          style={styles.bannerPin}
+          resizeMode="contain"
+        />
+
+        {/* "In Progress" pill — white bg, brand-navy dot + text */}
         <View style={styles.bannerPill}>
-          <View style={styles.greenDot} />
+          <View style={styles.pillDot} />
           <Text style={styles.bannerPillText}>In Progress</Text>
         </View>
 
@@ -155,7 +161,7 @@ export default function HomeScreen() {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const NAVY = '#1E1A52';
+const NAVY = '#0B0132';
 
 const styles = StyleSheet.create({
   container: {
@@ -167,7 +173,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
 
-  // Header
+  // ── Header
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -186,54 +192,73 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
 
-  // Banner
+  // ── Banner
   banner: {
     backgroundColor: NAVY,
     borderRadius: 18,
     padding: 22,
+    paddingBottom: 26,
     overflow: 'hidden',
     gap: 10,
-    minHeight: 170,
+    // ~28% of a 844px screen ≈ 186pt — matches the design proportion
+    minHeight: 186,
   },
-  bannerCircleLg: {
+
+  // Decorative ring — large faint circle top-right
+  bannerRingOuter: {
     position: 'absolute',
-    right: -50,
-    top: -50,
-    width: 200,
-    height: 200,
-    borderRadius: 100,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    right: -60,
+    top: -60,
+    width: 210,
+    height: 210,
+    borderRadius: 105,
+    borderWidth: 28,
+    borderColor: 'rgba(255,255,255,0.06)',
   },
-  bannerCircleSm: {
+  bannerRingInner: {
     position: 'absolute',
-    right: 80,
-    bottom: -70,
-    width: 160,
-    height: 160,
-    borderRadius: 80,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    right: -18,
+    top: -18,
+    width: 130,
+    height: 130,
+    borderRadius: 65,
+    borderWidth: 22,
+    borderColor: 'rgba(255,255,255,0.05)',
   },
+
+  // Decorative location pin — right edge, partially cropped
+  bannerPin: {
+    position: 'absolute',
+    right: -28,
+    bottom: -10,
+    width: 140,
+    height: 155,
+    opacity: 0.18,
+  },
+
+  // "In Progress" pill — white background, navy dot + text
   bannerPill: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(255,255,255,0.16)',
+    backgroundColor: '#FFFFFF',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 100,
     gap: 7,
   },
-  greenDot: {
+  pillDot: {
     width: 7,
     height: 7,
     borderRadius: 4,
-    backgroundColor: '#22C55E',
+    backgroundColor: NAVY,
   },
   bannerPillText: {
     fontSize: 12,
     fontFamily: 'Inter_500Medium',
-    color: '#FFFFFF',
+    color: NAVY,
   },
+
   bannerHeading: {
     fontSize: 22,
     fontFamily: 'Inter_700Bold',
@@ -248,7 +273,7 @@ const styles = StyleSheet.create({
     lineHeight: 19,
   },
 
-  // Quick Tiles
+  // ── Quick Tiles
   tilesRow: {
     flexDirection: 'row',
     gap: 12,
@@ -258,6 +283,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
+    // ~18% of 844px ≈ 150pt
     minHeight: 150,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -270,19 +296,17 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter_700Bold',
     color: '#060808',
     letterSpacing: -0.3,
-    marginBottom: 6,
   },
   quickTileImageWrap: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 6,
+    paddingVertical: 8,
   },
   quickTileSubtitle: {
     fontSize: 12,
     fontFamily: 'Inter_400Regular',
     color: '#666666',
-    marginTop: 6,
   },
   tripPlannerImg: {
     width: 90,
@@ -293,7 +317,7 @@ const styles = StyleSheet.create({
     height: 66,
   },
 
-  // Suggested
+  // ── Suggested
   sectionTitle: {
     fontSize: 22,
     fontFamily: 'Inter_700Bold',
