@@ -2,14 +2,12 @@ import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// When running on Replit, EXPO_PUBLIC_DOMAIN is injected by the dev script and
-// points to the proxied dev domain where the local API server lives.
-// EXPO_PUBLIC_API_BASE_URL overrides both for explicit control.
+// Default to the Railway production backend so existing accounts keep working.
+// Set EXPO_PUBLIC_API_BASE_URL to override (e.g. point to the local API server
+// by setting it to https://$REPLIT_DEV_DOMAIN in the mobile dev workflow).
 const BASE_URL =
   process.env['EXPO_PUBLIC_API_BASE_URL'] ??
-  (process.env['EXPO_PUBLIC_DOMAIN']
-    ? `https://${process.env['EXPO_PUBLIC_DOMAIN']}`
-    : 'https://ridespot-production-8e87.up.railway.app');
+  'https://ridespot-production-8e87.up.railway.app';
 
 const TOKEN_KEY = 'ridespot_auth_token';
 
