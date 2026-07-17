@@ -31,10 +31,19 @@ export async function removeToken(): Promise<void> {
   await SecureStore.deleteItemAsync(TOKEN_KEY);
 }
 
+// ─── Typed API error ──────────────────────────────────────────────────────────
+
+export class ApiError extends Error {
+  constructor(public readonly code: string, message: string) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
 // ─── HTTP client ──────────────────────────────────────────────────────────────
 
 // Backend response envelope: { success: true, data: T } or { success: false, error: { code, message } }
-type ApiEnvelope<T> = { success: true; data: T; message?: string } | { success: false; error: { code: string; message: string } };
+type ApiEnvelope<T> = { success: true; data: T; message?: string } | { success: false; error: { code: string; message: string; details?: { fieldErrors?: Record<string, string[]> } } };
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const token = await getToken();
@@ -47,25 +56,22 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, { ...options, headers });
   const body = (await res.json().catch(() => ({}))) as ApiEnvelope<T>;
 
-  // Handle API-level errors (success: false) or HTTP errors
   if (!res.ok || body.success === false) {
     if (body.success === false) {
       const err = body.error;
-      // If there are field-level validation details, surface them
-      const details = (err as unknown as { details?: { fieldErrors?: Record<string, string[]> } }).details;
-      if (details?.fieldErrors) {
-        const fieldMsgs = Object.entries(details.fieldErrors)
-          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+      // Surface field-level validation errors clearly
+      if (err.details?.fieldErrors) {
+        const fieldMsgs = Object.entries(err.details.fieldErrors)
+          .map(([, msgs]) => msgs.join(', '))
           .join('\n');
-        throw new Error(fieldMsgs || err.message);
+        throw new ApiError(err.code, fieldMsgs || err.message);
       }
-      throw new Error(err.message ?? `HTTP ${res.status}`);
+      throw new ApiError(err.code, err.message ?? `HTTP ${res.status}`);
     }
     const fallbackMsg = (body as unknown as { message?: string }).message;
-    throw new Error(fallbackMsg ?? `HTTP ${res.status}`);
+    throw new ApiError('HTTP_ERROR', fallbackMsg ?? `HTTP ${res.status}`);
   }
 
-  // Unwrap the data envelope
   return body.data;
 }
 

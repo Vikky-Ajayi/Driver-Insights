@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
   Modal,
   Pressable,
   ScrollView,
@@ -17,6 +16,7 @@ import * as Haptics from 'expo-haptics';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-controller';
 import { useColors } from '@/hooks/useColors';
 import { useAuth } from '@/contexts/AuthContext';
+import { useToast } from '@/components/Toast';
 
 const COUNTRIES = [
   { code: 'NG', flag: '🇳🇬', name: 'Nigeria', dial: '+234' },
@@ -31,6 +31,7 @@ export default function RegisterScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { register } = useAuth();
+  const toast = useToast();
 
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
@@ -45,25 +46,30 @@ export default function RegisterScreen() {
 
   const handleRegister = async () => {
     if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
-      Alert.alert('Missing fields', 'Please fill in all fields.');
+      toast.error('Missing fields', 'Please fill in all fields.');
       return;
     }
     if (!email.includes('@')) {
-      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      toast.error('Invalid email', 'Please enter a valid email address.');
       return;
     }
     if (password.length < 8) {
-      Alert.alert('Password too short', 'Password must be at least 8 characters.');
+      toast.error('Password too short', 'Password must be at least 8 characters.');
+      return;
+    }
+    if (!/\d/.test(password)) {
+      toast.error('Weak password', 'Password must include at least one number.');
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setLoading(true);
     try {
-      await register({ fullName, email, phone: `${dialCode}${phone}`, country, password });
-      router.push({ pathname: '/(auth)/verify-email', params: { email } });
+      await register({ fullName, email: email.trim(), phone: `${dialCode}${phone}`, country, password });
+      toast.success('Account created!', 'Check your email for the verification code.');
+      router.push({ pathname: '/(auth)/verify-email', params: { email: email.trim() } });
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Registration failed. Please try again.';
-      Alert.alert('Registration failed', message);
+      toast.error('Registration failed', message);
     } finally {
       setLoading(false);
     }
