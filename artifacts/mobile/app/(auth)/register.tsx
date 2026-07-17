@@ -44,8 +44,16 @@ export default function RegisterScreen() {
   const [showDialModal, setShowDialModal] = useState(false);
 
   const handleRegister = async () => {
-    if (!fullName || !email || !phone || !password) {
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !password) {
       Alert.alert('Missing fields', 'Please fill in all fields.');
+      return;
+    }
+    if (!email.includes('@')) {
+      Alert.alert('Invalid email', 'Please enter a valid email address.');
+      return;
+    }
+    if (password.length < 8) {
+      Alert.alert('Password too short', 'Password must be at least 8 characters.');
       return;
     }
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -151,7 +159,7 @@ export default function RegisterScreen() {
           <View>
             <TextInput
               style={[styles.input, { backgroundColor: colors.input, color: colors.foreground, paddingRight: 50 }]}
-              placeholder="--- --- --- --"
+              placeholder="Min. 8 characters"
               placeholderTextColor={colors.mutedForeground}
               value={password}
               onChangeText={setPassword}

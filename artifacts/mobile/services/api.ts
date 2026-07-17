@@ -49,11 +49,20 @@ async function request<T>(path: string, options?: RequestInit): Promise<T> {
 
   // Handle API-level errors (success: false) or HTTP errors
   if (!res.ok || body.success === false) {
-    const errMsg =
-      body.success === false
-        ? body.error?.message
-        : (body as unknown as { message?: string }).message;
-    throw new Error(errMsg ?? `HTTP ${res.status}`);
+    if (body.success === false) {
+      const err = body.error;
+      // If there are field-level validation details, surface them
+      const details = (err as unknown as { details?: { fieldErrors?: Record<string, string[]> } }).details;
+      if (details?.fieldErrors) {
+        const fieldMsgs = Object.entries(details.fieldErrors)
+          .map(([field, msgs]) => `${field}: ${msgs.join(', ')}`)
+          .join('\n');
+        throw new Error(fieldMsgs || err.message);
+      }
+      throw new Error(err.message ?? `HTTP ${res.status}`);
+    }
+    const fallbackMsg = (body as unknown as { message?: string }).message;
+    throw new Error(fallbackMsg ?? `HTTP ${res.status}`);
   }
 
   // Unwrap the data envelope
