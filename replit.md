@@ -1,15 +1,20 @@
-# [Project name]
+# RideSpot
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+A React Native (Expo) mobile app with an Express API backend for the RideSpot platform.
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- **Mobile app**: workflow `artifacts/mobile: expo` — Expo dev server on port 18115
+- **API server**: workflow `artifacts/api-server: API Server` — Express on port 8080
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
-- `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- `DATABASE_URL` — Postgres connection string (runtime-managed by Replit, no manual setup needed)
+
+## Expo Go Preview
+
+Scan the QR code shown in the `artifacts/mobile: expo` workflow logs with Expo Go on your phone.
+The Metro bundler URL is exposed via `REPLIT_EXPO_DEV_DOMAIN`.
 
 ## Stack
 
