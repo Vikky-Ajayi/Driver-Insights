@@ -18,7 +18,7 @@ The `request()` helper in `services/api.ts` unwraps `data` and throws on `succes
 | POST | `/api/auth/verify-email` | `email, code` | Verifies email. Field is `code` not `otp`. After success → navigate to login. |
 | POST | `/api/auth/forgot-password` | `email` | Sends reset code |
 | POST | `/api/auth/reset-password` | `email, code, newPassword` | Fields: `code` (not `otp`), `newPassword` (not `password`) |
-| POST | `/api/auth/resend-verification` | `email` | May not exist — silently swallowed in `resendVerification()` |
+| POST | `/api/auth/resend-otp` | `email, type` | type must be `'email_verification'` or `'password_reset'`. Used for resend verification and resend password reset. |
 
 ## Other routes
 | Method | Path | Notes |

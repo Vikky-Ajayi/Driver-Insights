@@ -151,11 +151,9 @@ export const authApi = {
     }),
 
   resendVerification: (email: string) =>
-    request<Record<string, never>>('/api/auth/resend-verification', {
+    request<Record<string, never>>('/api/auth/resend-otp', {
       method: 'POST',
-      body: JSON.stringify({ email }),
-    }).catch(() => {
-      // Endpoint may not exist — silently swallow
+      body: JSON.stringify({ email, type: 'email_verification' }),
     }),
 
   forgotPassword: (email: string) =>
