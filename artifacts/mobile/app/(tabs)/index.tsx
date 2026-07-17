@@ -11,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Feather, MaterialCommunityIcons } from '@expo/vector-icons';
 
+const NAVY = '#0B0132';
+
 // ─── Quick Tile ───────────────────────────────────────────────────────────────
 function QuickTile({
   title,
@@ -84,18 +86,18 @@ export default function HomeScreen() {
 
       {/* ── Driver Rating Banner ── */}
       <View style={styles.banner}>
-        {/* Decorative: large faint circle ring top-right */}
+        {/* Decorative rings — top-right corner */}
         <View style={styles.bannerRingOuter} />
         <View style={styles.bannerRingInner} />
 
-        {/* Decorative: location pin vector — right side, partially cropped */}
+        {/* Location pin vector — right side, partially cropped */}
         <Image
           source={require('@/assets/images/banner-pin.png')}
           style={styles.bannerPin}
           resizeMode="contain"
         />
 
-        {/* "In Progress" pill — white bg, brand-navy dot + text */}
+        {/* "In Progress" pill — white bg, navy dot, navy text */}
         <View style={styles.bannerPill}>
           <View style={styles.pillDot} />
           <Text style={styles.bannerPillText}>In Progress</Text>
@@ -161,8 +163,6 @@ export default function HomeScreen() {
 }
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const NAVY = '#0B0132';
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -200,43 +200,42 @@ const styles = StyleSheet.create({
     paddingBottom: 26,
     overflow: 'hidden',
     gap: 10,
-    // ~28% of a 844px screen ≈ 186pt — matches the design proportion
     minHeight: 186,
   },
 
-  // Decorative ring — large faint circle top-right
+  // Decorative rings — large faint circles top-right
   bannerRingOuter: {
     position: 'absolute',
-    right: -60,
-    top: -60,
-    width: 210,
-    height: 210,
-    borderRadius: 105,
-    borderWidth: 28,
+    right: -55,
+    top: -55,
+    width: 220,
+    height: 220,
+    borderRadius: 110,
+    borderWidth: 30,
     borderColor: 'rgba(255,255,255,0.06)',
   },
   bannerRingInner: {
     position: 'absolute',
-    right: -18,
-    top: -18,
-    width: 130,
-    height: 130,
-    borderRadius: 65,
-    borderWidth: 22,
+    right: -15,
+    top: -15,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderWidth: 24,
     borderColor: 'rgba(255,255,255,0.05)',
   },
 
-  // Decorative location pin — right edge, partially cropped
+  // Location pin vector — right edge, partially cropped
   bannerPin: {
     position: 'absolute',
-    right: -28,
-    bottom: -10,
-    width: 140,
-    height: 155,
-    opacity: 0.18,
+    right: -20,
+    bottom: -8,
+    width: 130,
+    height: 145,
+    opacity: 0.45,
   },
 
-  // "In Progress" pill — white background, navy dot + text
+  // "In Progress" pill — white bg, navy dot, navy text
   bannerPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -283,7 +282,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     padding: 14,
-    // ~18% of 844px ≈ 150pt
     minHeight: 150,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },
@@ -313,8 +311,8 @@ const styles = StyleSheet.create({
     height: 72,
   },
   discoverImg: {
-    width: 100,
-    height: 66,
+    width: 110,
+    height: 72,
   },
 
   // ── Suggested

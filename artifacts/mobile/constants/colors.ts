@@ -28,7 +28,7 @@ const colors = {
     upgradeLight: '#EFF6FF', // blue badge bg
     onlineDot: '#22C55E',    // online status dot
     offlineDot: '#9CA3AF',   // offline status dot
-    tabActive: '#060808',
+    tabActive: '#0B0132',
     tabInactive: '#9CA3AF',
   },
   radius: 12,
